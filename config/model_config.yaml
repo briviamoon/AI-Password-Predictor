@@ -1,0 +1,6 @@
+model_parameters:
+  vectorizer:
+    ngram_range: (1, 2)
+    max_features: 5000
+  classifier:
+    alpha: 0.1

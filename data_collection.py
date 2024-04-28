@@ -1,22 +1,41 @@
 import os
+import csv
 import datetime
 
-def collect_user_interaction(input_phrase, generated_passphrase):
+def collect_user_interaction(input_data, output_file):
     """
-    Records user interactions, including input phrases and generated passphrases.
-    Stores the collected data in log files.
+    Collects user interactions and stores them in a CSV file.
 
     Args:
-        input_phrase (str): User's input phrase.
-        generated_passphrase (str): Generated passphrase.
+        input_data (dict): Dictionary containing user interaction data.
+        output_file (str): Path to the output CSV file.
     """
-    current_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    log_filename = f"data_interaction_{current_date}.log"
+    fieldnames = ["timestamp", "user_id", "interaction_type", "interaction_data"]
+    write_header = not os.path.exists(output_file)
 
-    with open(os.path.join("logs", log_filename), "a") as logfile:
-        logfile.write(f"Input phrase: {input_phrase}, Generated passphrase: {generated_passphrase}\n")
+    with open(output_file, mode='a', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        if write_header:
+            writer.writeheader()
+        
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        user_id = input_data.get("user_id", "")
+        interaction_type = input_data.get("interaction_type", "")
+        interaction_data = input_data.get("interaction_data", "")
+
+        writer.writerow({
+            "timestamp": timestamp,
+            "user_id": user_id,
+            "interaction_type": interaction_type,
+            "interaction_data": interaction_data
+        })
 
 if __name__ == "__main__":
-    input_phrase = input("Enter your input phrase: ")
-    generated_passphrase = input("Enter the generated passphrase: ")
-    collect_user_interaction(input_phrase, generated_passphrase)
+    # Example usage
+    input_data = {
+        "user_id": "123",
+        "interaction_type": "login",
+        "interaction_data": "username: example_user"
+    }
+    output_file = "data/user_interactions.csv"
+    collect_user_interaction(input_data, output_file)
